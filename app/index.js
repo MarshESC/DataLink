@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -7,7 +9,10 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
   user: process.env.PGUSER,
   password: process.env.PGPASSWORD,
-  ssl: { rejectUnauthorized: false },
+  ssl: {
+    ca: fs.readFileSync(path.join(__dirname, 'global-bundle.pem')).toString(),
+    rejectUnauthorized: true,
+  },
 });
 
 async function main() {
