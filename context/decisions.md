@@ -13,3 +13,16 @@ Append-only. Most recent last.
   "script or app that connects... does one read/write" — EC2 keeps the
   SG-to-SG relationship visible and simple; Lambda-in-VPC would add ENI
   cold-start complexity that doesn't serve the learning goal here.
+- 2026-08-19: Switched `index.js`'s pg SSL config from
+  `rejectUnauthorized: false` to `rejectUnauthorized: true` + AWS's
+  RDS global CA bundle (`app/global-bundle.pem`, committed — it's a
+  public cert, not a secret). Reason: `false` encrypts the connection
+  but accepts any certificate, including a forged one from a MITM —
+  caught by a post-push automated security review, fixed and verified
+  live before continuing.
+- 2026-08-19: Torn down via AWS CLI (`aws ec2 terminate-instances`,
+  `aws rds delete-db-instance`, `aws ec2 delete-security-group`)
+  instead of the console, once doc/proof was already captured.
+  Reason: faster, and output doubled as a clean audit trail of exactly
+  what got deleted (instance IDs, SG IDs) — pasted into this log and
+  the learning plan checklist.
